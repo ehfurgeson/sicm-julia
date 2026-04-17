@@ -1,0 +1,13 @@
+---
+title: "SICM Julia Chapter 1"
+engine: julia
+---
+
+Exercises from the first chapter of *Struture and Interpretation of Classical Mechanics* by Gerald Jay Sussman and Jack Wisdom
+
+All exercises are done in Julia
+
+``` {julia}
+x = "hello world!"
+Base.length(x)
+```
