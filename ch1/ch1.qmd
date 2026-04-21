@@ -7,7 +7,53 @@ Exercises from the first chapter of *Struture and Interpretation of Classical Me
 
 All exercises are done in Julia
 
+## 1.1 Fermat Optics
+Fermat observed that the laws of reflection and refraction could be accounted for by the following facts: 
+- Light travels in a straight line in any particular medium with a velocity that depends upon the medium.
+- The path taken by a ray from a source to a destination through any sequence of media is a path of least total time, compared to neighboring paths. 
+Show that these facts do imply the laws of reflection and refraction.
+
 ``` {julia}
-x = "hello world!"
-Base.length(x)
+using Optim 
+
+# 1. Define the "Time" function based on geometry
+# Suppose light goes from (x = -1, y = 1) to (x = 1, y = -1) 
+# and the interface is at y=0.
+function total_time(x_interface, n1, n2)
+    # Velocity v = c/n. We'll let c = 1 for simplicity.
+    v1 = 1 / n1
+    v2 = 1 / n2
+    
+    # Distance in medium 1 (hypotenuse)
+    d1 = sqrt((-1 - x_interface)^2 + (1 - 0)^2)
+    # Distance in medium 2 (hypotenuse)
+    d2 = sqrt((1 - x_interface)^2 + (-1 - 0)^2)
+    
+    return (d1 / v1) + (d2 / v2)
+end
+
+# 2. Use a solver to find the x_interface that minimizes time
+n1, n2 = 1.0, 1.5
+res = optimize(x -> total_time(x, n1, n2), -1.0, 1.0)
+best_x = res.minimizer
+
+# 3. Calculate angles from that best_x 
+# We started at x=-1 and ended at x=1. Interface is at y=0.
+# best_x is where the light hit the interface.
+
+# atan(opposite/adjacent)
+# Medium 1, horizontal distance is (best_x - (-1))
+theta1_calc = atan(abs(best_x - (-1)), 1) 
+
+# Medium 2, horizontal distance is (1 - best_x)
+theta2_calc = atan(abs(1 - best_x), 1)
+
+# 4. Verify Snell's Law, n1*sin(theta1) should equal n2*sin(theta2)
+lhs = n1 * sin(theta1_calc)
+rhs = n2 * sin(theta2_calc)
+
+println("Angle in, ", rad2deg(theta1_calc))
+println("Angle out, ", rad2deg(theta2_calc))
+println("Ratio (LHS/RHS), ", lhs / rhs) # Should be very close to 1.0
 ```
+
